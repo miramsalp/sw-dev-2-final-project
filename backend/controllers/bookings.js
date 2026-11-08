@@ -15,12 +15,16 @@ const parseBookingInput = ({ bookingDate, startTime, durationHours }) => {
 
   const date = new Date(`${bookingDate}T00:00:00.000Z`);
   if (Number.isNaN(date.getTime())) return { error: "Invalid booking date" };
-  const today = new Date(Date.now() + THAILAND_UTC_OFFSET_MS);
+  const now = new Date(Date.now() + THAILAND_UTC_OFFSET_MS);
+  const today = new Date(now);
   today.setUTCHours(0, 0, 0, 0);
   if (date < today) return { error: "Booking date cannot be in the past" };
 
   const [hours, minutes] = startTime.split(":").map(Number);
   const startMinutes = hours * 60 + minutes;
+  if (date.getTime() === today.getTime() && startMinutes < now.getUTCHours() * 60 + now.getUTCMinutes()) {
+    return { error: "Booking start time cannot be in the past" };
+  }
   const endMinutes = startMinutes + duration * 60;
   if (endMinutes > 1440) return { error: "Booking must end on the same day" };
 

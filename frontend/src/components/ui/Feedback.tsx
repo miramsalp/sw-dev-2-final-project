@@ -12,5 +12,9 @@ export function Loading() {
 }
 
 export function PageTitle({ children }: { children: React.ReactNode }) {
-  return <h1 className="mb-6 text-2xl font-bold">{children}</h1>;
+  return (
+    <h1 className="mb-4 text-center font-plex text-4xl leading-[66px] font-bold sm:text-5xl">
+      {children}
+    </h1>
+  );
 }

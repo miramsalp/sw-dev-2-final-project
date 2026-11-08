@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { bookingsApi } from "./api";
 import { BookingForm } from "./BookingForm";
@@ -17,23 +16,18 @@ export function CreateBooking({ facilityId }: { facilityId: string }) {
     router.push("/bookings");
   };
 
-  return (
-    <section>
-      <h2 className="mb-3 text-lg font-bold">Book this facility</h2>
-      {!user && (
-        <p>
-          <Link href="/login" className="underline">
-            Log in
-          </Link>{" "}
-          as a member to book.
-        </p>
-      )}
-      {user?.role === "admin" && <p>Admins cannot create bookings. Log in as a member.</p>}
-      {user?.role === "member" && (
-        <Card>
-          <BookingForm submitLabel="Book" onSubmit={create} />
-        </Card>
-      )}
-    </section>
-  );
+  if (!user) {
+    return (
+      <p className="text-xl">
+        <Link href="/login" className="font-semibold underline">
+          Log in
+        </Link>{" "}
+        as a member to book this activity.
+      </p>
+    );
+  }
+  if (user.role === "admin") {
+    return <p className="text-xl">Admins cannot create bookings. Log in as a member.</p>;
+  }
+  return <BookingForm submitLabel="Create" onSubmit={create} />;
 }

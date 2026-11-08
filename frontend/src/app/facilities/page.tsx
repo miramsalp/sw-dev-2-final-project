@@ -3,12 +3,18 @@ import { getFacilities } from "@/features/facilities/api";
 import { FacilityList } from "@/features/facilities/FacilityList";
 import { errorMessage } from "@/lib/api";
 
-export default async function FacilitiesPage() {
+export default async function FacilitiesPage({ searchParams }: PageProps<"/facilities">) {
+  const { editBooking } = await searchParams;
   const result = await getFacilities().then(
     (facilities) => ({ facilities, error: null }),
     (error) => ({ facilities: null, error: errorMessage(error) }),
   );
 
   if (!result.facilities) return <ErrorBox message={result.error} />;
-  return <FacilityList facilities={result.facilities} />;
+  return (
+    <FacilityList
+      facilities={result.facilities}
+      editBookingId={typeof editBooking === "string" ? editBooking : undefined}
+    />
+  );
 }

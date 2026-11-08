@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Card, ErrorBox, Field, Input, PageTitle } from "@/components/ui";
+import { Button, ErrorBox, Input } from "@/components/ui";
 import { errorMessage } from "@/lib/api";
+import { AuthSplitLayout } from "./AuthSplitLayout";
 import { useAuth } from "./AuthProvider";
 
 export function LoginForm() {
@@ -30,28 +31,41 @@ export function LoginForm() {
   };
 
   return (
-    <div className="mx-auto max-w-md">
-      <PageTitle>Log in</PageTitle>
-      <Card>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <ErrorBox message={error} />
-          <Field label="Email">
-            <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-          </Field>
-          <Field label="Password">
-            <Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-          </Field>
-          <Button type="submit" disabled={submitting}>
-            {submitting ? "Logging in..." : "Log in"}
-          </Button>
-        </form>
-      </Card>
-      <p className="mt-4 text-sm">
-        No account yet?{" "}
-        <Link href="/register" className="underline">
-          Register
-        </Link>
-      </p>
-    </div>
+    <AuthSplitLayout>
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full max-w-[598px] min-w-0 flex-col items-start gap-6"
+      >
+        <h1 className="text-2xl font-semibold">Log in</h1>
+        <ErrorBox message={error} />
+        <div className="flex w-full flex-col gap-5">
+          <Input
+            aria-label="Email"
+            placeholder="Email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            aria-label="Password"
+            placeholder="Password"
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <Button type="submit" size="lg" disabled={submitting}>
+          {submitting ? "Logging in..." : "Log in"}
+        </Button>
+        <p className="text-sm">
+          No account yet?{" "}
+          <Link href="/register" className="underline">
+            Register
+          </Link>
+        </p>
+      </form>
+    </AuthSplitLayout>
   );
 }

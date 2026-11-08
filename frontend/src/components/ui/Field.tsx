@@ -15,5 +15,19 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
 }
 
 export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select className={inputClass} {...props} />;
+  return (
+    <div className="relative w-full">
+      <select className={`${inputClass} appearance-none pr-10`} {...props} />
+      <svg
+        aria-hidden
+        width="12"
+        height="8"
+        viewBox="0 0 12 8"
+        fill="none"
+        className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2"
+      >
+        <path d="M1 1.5l5 5 5-5" stroke="currentColor" strokeWidth="2" />
+      </svg>
+    </div>
+  );
 }

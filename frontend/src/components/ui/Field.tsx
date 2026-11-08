@@ -1,4 +1,5 @@
-const inputClass = "w-full border border-black bg-white px-3 py-2 text-black disabled:border-dashed";
+const inputClass =
+  "h-12 w-full border-b border-black bg-[#f0f0f0] px-3.5 pt-[11px] pb-1 text-xl font-medium text-black placeholder:text-[#717171] disabled:border-dashed";
 
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

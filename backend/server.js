@@ -169,6 +169,19 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use("/api/v1", async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error(`Database connection failed: ${error.message}`);
+    res.status(503).json({
+      success: false,
+      error: "Database is unavailable, please try again.",
+    });
+  }
+});
+
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/facilities", facilities);
 app.use("/api/v1/bookings", bookings);

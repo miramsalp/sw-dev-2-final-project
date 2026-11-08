@@ -29,5 +29,5 @@ export function CreateBooking({ facilityId }: { facilityId: string }) {
   if (user.role === "admin") {
     return <p className="text-xl">Admins cannot create bookings. Log in as a member.</p>;
   }
-  return <BookingForm submitLabel="Create" onSubmit={create} />;
+  return <BookingForm facilityId={facilityId} submitLabel="Create" onSubmit={create} />;
 }

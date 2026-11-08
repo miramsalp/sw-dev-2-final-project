@@ -66,6 +66,8 @@ export function EditBooking({ id, facilityId }: { id: string; facilityId?: strin
           hint="click on the card to change activity"
         >
           <BookingForm
+            facilityId={facility?._id}
+            excludeBookingId={booking._id}
             submitLabel="Save"
             initial={{
               bookingDate: toDateInput(booking.bookingDate),

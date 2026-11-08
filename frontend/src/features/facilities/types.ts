@@ -8,3 +8,14 @@ export interface Facility {
 }
 
 export type FacilityInput = Omit<Facility, "_id">;
+
+export interface BookedSlot {
+  _id: string;
+  startMinutes: number;
+  endMinutes: number;
+}
+
+export interface FacilityAvailability {
+  date: string;
+  booked: BookedSlot[];
+}

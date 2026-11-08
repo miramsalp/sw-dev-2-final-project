@@ -1,6 +1,9 @@
 const Booking = require("../models/Booking");
 const Facility = require("../models/Facility");
 
+// "Today" follows Thai time; bookingDate itself is stored as midnight UTC of the chosen day.
+const THAILAND_UTC_OFFSET_MS = 7 * 60 * 60 * 1000;
+
 const parseBookingInput = ({ bookingDate, startTime, durationHours }) => {
   if (!bookingDate || !/^([01]\d|2[0-3]):[0-5]\d$/.test(startTime || "")) {
     return { error: "bookingDate and startTime in HH:mm format are required" };
@@ -12,7 +15,7 @@ const parseBookingInput = ({ bookingDate, startTime, durationHours }) => {
 
   const date = new Date(`${bookingDate}T00:00:00.000Z`);
   if (Number.isNaN(date.getTime())) return { error: "Invalid booking date" };
-  const today = new Date();
+  const today = new Date(Date.now() + THAILAND_UTC_OFFSET_MS);
   today.setUTCHours(0, 0, 0, 0);
   if (date < today) return { error: "Booking date cannot be in the past" };
 

@@ -93,6 +93,7 @@ The API runs on `http://localhost:5000` by default.
 - `GET /api/v1/auth/logout`
 - `GET /api/v1/facilities`
 - `GET /api/v1/facilities/:id`
+- `GET /api/v1/facilities/:id/availability?date=YYYY-MM-DD`
 - `POST /api/v1/facilities` (admin)
 - `PUT /api/v1/facilities/:id` (admin)
 - `DELETE /api/v1/facilities/:id` (admin)

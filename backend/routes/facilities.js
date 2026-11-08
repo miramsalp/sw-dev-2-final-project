@@ -250,6 +250,89 @@
  *         }
  *       ]
  *     }
+ *   },
+ *   "/api/v1/facilities/{id}/availability": {
+ *     "get": {
+ *       "tags": [
+ *         "Facilities"
+ *       ],
+ *       "summary": "Get booked time ranges for a day",
+ *       "description": "Public. Returns the booked ranges of one active facility on a date, without any member details. Times are minutes after midnight.",
+ *       "security": [],
+ *       "responses": {
+ *         "200": {
+ *           "description": "Successful operation.",
+ *           "content": {
+ *             "application/json": {
+ *               "schema": {
+ *                 "type": "object",
+ *                 "properties": {
+ *                   "success": {
+ *                     "type": "boolean",
+ *                     "example": true
+ *                   },
+ *                   "data": {
+ *                     "type": "object",
+ *                     "properties": {
+ *                       "date": {
+ *                         "type": "string",
+ *                         "example": "2026-11-08"
+ *                       },
+ *                       "booked": {
+ *                         "type": "array",
+ *                         "items": {
+ *                           "type": "object",
+ *                           "properties": {
+ *                             "_id": {
+ *                               "type": "string"
+ *                             },
+ *                             "startMinutes": {
+ *                               "type": "integer",
+ *                               "example": 540
+ *                             },
+ *                             "endMinutes": {
+ *                               "type": "integer",
+ *                               "example": 600
+ *                             }
+ *                           }
+ *                         }
+ *                       }
+ *                     }
+ *                   }
+ *                 }
+ *               }
+ *             }
+ *           }
+ *         },
+ *         "400": {
+ *           "$ref": "#/components/responses/Error400"
+ *         },
+ *         "404": {
+ *           "$ref": "#/components/responses/Error404"
+ *         },
+ *         "429": {
+ *           "$ref": "#/components/responses/Error429"
+ *         },
+ *         "500": {
+ *           "$ref": "#/components/responses/Error500"
+ *         }
+ *       },
+ *       "parameters": [
+ *         {
+ *           "$ref": "#/components/parameters/ResourceId"
+ *         },
+ *         {
+ *           "name": "date",
+ *           "in": "query",
+ *           "required": true,
+ *           "schema": {
+ *             "type": "string",
+ *             "format": "date"
+ *           },
+ *           "description": "Day to check, in YYYY-MM-DD format."
+ *         }
+ *       ]
+ *     }
  *   }
  * }
  */
@@ -257,6 +340,7 @@ const express = require("express");
 const {
   getFacilities,
   getFacility,
+  getFacilityAvailability,
   createFacility,
   updateFacility,
   deleteFacility,
@@ -265,6 +349,7 @@ const { protect, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 router.route("/").get(getFacilities).post(protect, authorize("admin"), createFacility);
+router.get("/:id/availability", getFacilityAvailability);
 router.route("/:id").get(getFacility).put(protect, authorize("admin"), updateFacility).delete(protect, authorize("admin"), deleteFacility);
 
 module.exports = router;

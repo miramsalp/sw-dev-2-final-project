@@ -1,5 +1,9 @@
 export const toDateInput = (iso: string) => iso.slice(0, 10);
 
+/** Today's date (YYYY-MM-DD) in Thai time: same rule as the backend, on server and client. */
+export const todayInThailand = () =>
+  new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** "HH:mm" -> minutes after midnight. */

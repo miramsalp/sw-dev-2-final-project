@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Button, DatePicker, ErrorBox, Select } from "@/components/ui";
 import { errorMessage } from "@/lib/api";
-import { toMinutes, toTime } from "@/lib/format";
+import { todayInThailand, toMinutes, toTime } from "@/lib/format";
+import { AvailabilityTable } from "./AvailabilityTable";
 import type { BookingInput } from "./types";
 
 const STEP = 15; // minutes
@@ -22,15 +23,16 @@ const endOptionsFor = (start: number) =>
 const withValue = (options: number[], value: number | null) =>
   value === null || options.includes(value) ? options : [...options, value].sort((a, b) => a - b);
 
-// Same "today" rule as the backend (UTC), and identical on server and client.
-const todayUtc = () => new Date().toISOString().slice(0, 10);
-
 export function BookingForm({
+  facilityId,
+  excludeBookingId,
   initial,
   submitLabel,
   onSubmit,
   extraActions,
 }: {
+  facilityId?: string;
+  excludeBookingId?: string;
   initial?: BookingInput;
   submitLabel: string;
   onSubmit: (input: BookingInput) => Promise<void>;
@@ -79,10 +81,17 @@ export function BookingForm({
         <DatePicker
           ariaLabel="Date"
           placeholder="Date"
-          min={todayUtc()}
+          min={todayInThailand()}
           value={bookingDate}
           onChange={setBookingDate}
         />
+        {facilityId && bookingDate && (
+          <AvailabilityTable
+            facilityId={facilityId}
+            date={bookingDate}
+            excludeBookingId={excludeBookingId}
+          />
+        )}
         <Select
           aria-label="Start time"
           required

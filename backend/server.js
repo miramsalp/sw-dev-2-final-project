@@ -119,6 +119,7 @@
  *   }
  * }
  */
+const path = require("node:path");
 const express = require("express");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
@@ -133,16 +134,20 @@ const auth = require("./routes/auth");
 const facilities = require("./routes/facilities");
 const bookings = require("./routes/bookings");
 
-dotenv.config({ path: "./config/config.env" });
+dotenv.config({ path: path.join(__dirname, "config", "config.env") });
+
+const isVercel = Boolean(process.env.VERCEL);
 
 if (process.env.MONGO_URI) {
   connectDB().catch((error) => {
     console.error(`Database connection failed: ${error.message}`);
-    process.exit(1);
+    if (!isVercel) process.exit(1);
   });
 }
 
 const app = express();
+
+app.set("trust proxy", 1);
 
 app.use(helmet());
 app.use(hpp());
@@ -177,7 +182,7 @@ const swaggerDocs = swaggerJsDoc({
       description: "REST API for sports facility management and bookings.",
     },
     servers: [{
-      url: `http://localhost:${process.env.PORT || 5000}`,
+      url: "/",
     }],
     components: {
       securitySchemes: {
@@ -189,7 +194,7 @@ const swaggerDocs = swaggerJsDoc({
       },
     },
   },
-  apis: ["./routes/*.js", "./server.js"],
+  apis: [path.join(__dirname, "routes", "*.js"), __filename],
 });
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
@@ -228,19 +233,21 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`Sports Facility Booking API running on http://localhost:${PORT}`);
-});
+if (!isVercel) {
+  const PORT = process.env.PORT || 5000;
+  const server = app.listen(PORT, () => {
+    console.log(`Sports Facility Booking API running on http://localhost:${PORT}`);
+  });
 
-process.on("unhandledRejection", (error) => {
-  console.error(`Unhandled rejection: ${error.message}`);
-  server.close(() => process.exit(1));
-});
+  process.on("unhandledRejection", (error) => {
+    console.error(`Unhandled rejection: ${error.message}`);
+    server.close(() => process.exit(1));
+  });
 
-process.on("uncaughtException", (error) => {
-  console.error(`Uncaught exception: ${error.message}`);
-  process.exit(1);
-});
+  process.on("uncaughtException", (error) => {
+    console.error(`Uncaught exception: ${error.message}`);
+    process.exit(1);
+  });
+}
 
-module.exports = { app, server };
+module.exports = app;

@@ -1,80 +1,137 @@
 "use client";
 
-// TODO: Admin panel is layout only, not connected to the API yet.
-//   Facilities: useFacilities() from @/features/facilities/hooks + facilitiesApi.create/update/remove(token, ...) from @/features/facilities/api
-//   Bookings:   useBookings() from @/features/bookings/hooks (admin gets ALL bookings) + bookingsApi.remove(token, id)
-//               Get token from useAuth() in @/features/auth/AuthProvider
-//               Render with <BookingTable showMember ... />; Edit links already go to /bookings/[id]/edit
-//   See features/bookings/MyBookings.tsx for a working example.
-
-import { Button, Card, Field, Input, PageTitle, Table, Td, Tr } from "@/components/ui";
+import { useState } from "react";
+import { Button, ErrorBox, LinkButton, Loading, PageShell } from "@/components/ui";
+import { errorMessage } from "@/lib/api";
+import { endTime, formatDate } from "@/lib/format";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { bookingsApi } from "@/features/bookings/api";
+import { useBookings } from "@/features/bookings/hooks";
+import type { Booking } from "@/features/bookings/types";
+import { facilitiesApi } from "@/features/facilities/api";
+import { useFacilities } from "@/features/facilities/hooks";
+import type { Facility, FacilityInput } from "@/features/facilities/types";
+import { AdminListCard } from "./AdminListCard";
+import { FacilityForm } from "./FacilityForm";
 
 export function AdminPanel() {
   return (
-    <div>
-      <PageTitle>Admin Panel</PageTitle>
-      <div className="flex flex-col gap-10">
+    <PageShell>
+      <h1 className="text-center text-[40px] font-bold">Admin Panel</h1>
+      <div className="mt-4 flex flex-col gap-10">
         <FacilitiesSection />
         <AllBookingsSection />
       </div>
-    </div>
+    </PageShell>
   );
 }
 
 function FacilitiesSection() {
+  const { token } = useAuth();
+  const { data: facilities, error, loading, reload } = useFacilities();
+  const [editing, setEditing] = useState<Facility | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const handleSubmit = async (input: FacilityInput) => {
+    if (editing) {
+      await facilitiesApi.update(token, editing._id, input);
+      setEditing(null);
+    } else {
+      await facilitiesApi.create(token, input);
+    }
+    reload();
+  };
+
+  const handleEdit = (facility: Facility) => {
+    setActionError(null);
+    setEditing(facility);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDelete = async (facility: Facility) => {
+    if (!confirm(`Delete ${facility.name}?`)) return;
+    setActionError(null);
+    try {
+      await facilitiesApi.remove(token, facility._id);
+      if (editing?._id === facility._id) setEditing(null);
+      reload();
+    } catch (err) {
+      setActionError(errorMessage(err));
+    }
+  };
+
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold">Facilities</h2>
-
-      <Card>
-        <h3 className="mb-3 font-bold">Add facility</h3>
-        {/* TODO: controlled form state + facilitiesApi.create() */}
-        <form className="grid gap-3 sm:grid-cols-2" onSubmit={(e) => e.preventDefault()}>
-          <Field label="Name">
-            <Input disabled />
-          </Field>
-          <Field label="Sport type">
-            <Input disabled />
-          </Field>
-          <Field label="Location">
-            <Input disabled />
-          </Field>
-          <Field label="Capacity">
-            <Input type="number" disabled />
-          </Field>
-          <Field label="Hourly rate (THB)">
-            <Input type="number" disabled />
-          </Field>
-          <div className="flex items-end">
-            <Button type="submit" disabled>
-              Add facility (TODO)
-            </Button>
-          </div>
-        </form>
-      </Card>
-
-      {/* TODO: list useFacilities() rows; Edit -> facilitiesApi.update, Delete -> facilitiesApi.remove */}
-      <PlaceholderTable columns={["Name", "Sport", "Location", "Capacity", "Rate", "Actions"]} />
+      <h2 className="text-2xl font-bold">Facilities</h2>
+      <FacilityForm
+        key={editing?._id ?? "new"}
+        editing={editing}
+        onSubmit={handleSubmit}
+        onCancel={() => setEditing(null)}
+      />
+      {loading && <Loading />}
+      <ErrorBox message={error ?? actionError} />
+      {facilities?.length === 0 && <p>No facilities yet.</p>}
+      {facilities?.map((facility) => (
+        <AdminListCard
+          key={facility._id}
+          title={facility.name}
+          details={[
+            `${facility.sportType} · ${facility.location}`,
+            `Capacity: ${facility.capacity} · ${facility.hourlyRate} THB/hour`,
+          ]}
+        >
+          <Button size="sm" onClick={() => handleEdit(facility)}>
+            Edit
+          </Button>
+          <Button size="sm" variant="danger" onClick={() => handleDelete(facility)}>
+            Delete
+          </Button>
+        </AdminListCard>
+      ))}
     </section>
   );
 }
 
 function AllBookingsSection() {
+  const { token } = useAuth();
+  const { data: bookings, error, loading, reload } = useBookings();
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const handleDelete = async (booking: Booking) => {
+    if (!confirm(`Delete ${booking.user?.name ?? "this member"}'s booking?`)) return;
+    setActionError(null);
+    try {
+      await bookingsApi.remove(token, booking._id);
+      reload();
+    } catch (err) {
+      setActionError(errorMessage(err));
+    }
+  };
+
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold">All bookings</h2>
-      {/* TODO: replace with <BookingTable showMember bookings={...} onDelete={...} /> */}
-      <PlaceholderTable columns={["Member", "Facility", "Date", "Time", "Hours", "Actions"]} />
+      <h2 className="text-2xl font-bold">All bookings</h2>
+      {loading && <Loading />}
+      <ErrorBox message={error ?? actionError} />
+      {bookings?.length === 0 && <p>No bookings yet.</p>}
+      {bookings?.map((booking) => (
+        <AdminListCard
+          key={booking._id}
+          title={booking.facility?.name ?? "(removed)"}
+          details={[
+            `${formatDate(booking.bookingDate)} ·${booking.startTime}–${endTime(booking.startTime, booking.durationHours)} · ${booking.durationHours} ${booking.durationHours === 1 ? "hour" : "hours"}`,
+            `Member: ${booking.user?.name ?? "(removed)"}`,
+          ]}
+        >
+          <LinkButton size="sm" href={`/bookings/${booking._id}/edit`}>
+            Edit
+          </LinkButton>
+          <Button size="sm" variant="danger" onClick={() => handleDelete(booking)}>
+            Delete
+          </Button>
+        </AdminListCard>
+      ))}
     </section>
-  );
-}
-
-function PlaceholderTable({ columns }: { columns: string[] }) {
-  return (
-    <Table columns={columns}>
-      <Tr>
-        <Td colSpan={columns.length}>Not connected yet (TODO)</Td>
-      </Tr>
-    </Table>
   );
 }

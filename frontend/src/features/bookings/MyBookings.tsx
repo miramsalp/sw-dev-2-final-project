@@ -1,45 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { ErrorBox, Loading, PageTitle } from "@/components/ui";
-import { errorMessage } from "@/lib/api";
-import { useAuth } from "@/features/auth/AuthProvider";
-import { bookingsApi } from "./api";
+import { AddCard, BackToTop, ErrorBox, Loading, PageShell, PageTitle } from "@/components/ui";
 import { useBookings } from "./hooks";
-import { BookingTable } from "./BookingTable";
-import type { Booking } from "./types";
+import { BookingCard } from "./BookingCard";
 
 export function MyBookings() {
-  const { token } = useAuth();
-  const { data: bookings, error, loading, reload } = useBookings();
-  const [actionError, setActionError] = useState<string | null>(null);
-
-  const handleDelete = async (booking: Booking) => {
-    if (!confirm(`Delete booking at ${booking.facility?.name ?? "this facility"}?`)) return;
-    setActionError(null);
-    try {
-      await bookingsApi.remove(token, booking._id);
-      reload();
-    } catch (err) {
-      setActionError(errorMessage(err));
-    }
-  };
+  const { data: bookings, error, loading } = useBookings();
 
   return (
-    <div>
+    <PageShell>
       <PageTitle>My Bookings</PageTitle>
-      {loading && <Loading />}
-      <ErrorBox message={error ?? actionError} />
-      {bookings?.length === 0 && (
-        <p>
-          No bookings yet.{" "}
-          <Link href="/facilities" className="underline">
-            Book a facility
-          </Link>
-        </p>
-      )}
-      {!!bookings?.length && <BookingTable bookings={bookings} onDelete={handleDelete} />}
-    </div>
+      <div className="mx-auto flex max-w-[732px] flex-col gap-1">
+        <AddCard href="/facilities" label="New booking" />
+        {loading && <Loading />}
+        <ErrorBox message={error} />
+        {bookings?.length === 0 && (
+          <p className="py-6 text-center text-xl font-light">No bookings yet. Press (+) to book an activity.</p>
+        )}
+        {bookings?.map((b) => <BookingCard key={b._id} booking={b} />)}
+      </div>
+      <BackToTop />
+    </PageShell>
   );
 }

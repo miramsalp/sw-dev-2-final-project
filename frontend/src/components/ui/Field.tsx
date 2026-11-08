@@ -10,14 +10,14 @@ export function Field({ label, children }: { label: string; children: React.Reac
   );
 }
 
-export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={inputClass} {...props} />;
+export function Input({ className = "", ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+  return <input className={`${inputClass} ${className}`} {...props} />;
 }
 
-export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
+export function Select({ className = "", ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <div className="relative w-full">
-      <select className={`${inputClass} appearance-none pr-10`} {...props} />
+      <select className={`${inputClass} appearance-none pr-10 ${className}`} {...props} />
       <svg
         aria-hidden
         width="12"

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, ErrorBox, Input, Select } from "@/components/ui";
 import { errorMessage } from "@/lib/api";
+import { AuthSplitLayout } from "./AuthSplitLayout";
 import { useAuth } from "./AuthProvider";
 import type { Role } from "./types";
 
@@ -62,21 +62,7 @@ export function RegisterForm() {
   };
 
   return (
-    <div
-      data-full-bleed
-      className="mt-2.5 flex items-center justify-center gap-16 px-4 py-4 font-plex"
-    >
-      <div className="relative hidden h-[902px] w-[606px] shrink-0 xl:block">
-        <Image
-          src="/images/register-banner.jpg"
-          alt=""
-          fill
-          preload
-          sizes="606px"
-          className="object-cover"
-        />
-      </div>
-
+    <AuthSplitLayout>
       <form
         onSubmit={handleSubmit}
         noValidate
@@ -129,6 +115,6 @@ export function RegisterForm() {
           </Link>
         </p>
       </form>
-    </div>
+    </AuthSplitLayout>
   );
 }

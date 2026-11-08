@@ -1,16 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { Card, ErrorBox, Loading, PageTitle } from "@/components/ui";
+import { Card, PageTitle } from "@/components/ui";
 import { CreateBooking } from "@/features/bookings/CreateBooking";
-import { useFacility } from "./api";
+import type { Facility } from "./types";
 
-export function FacilityDetail({ id }: { id: string }) {
-  const { data: facility, error, loading } = useFacility(id);
-
-  if (loading) return <Loading />;
-  if (error || !facility) return <ErrorBox message={error ?? "Facility not found"} />;
-
+export function FacilityDetail({ facility }: { facility: Facility }) {
   return (
     <div className="flex flex-col gap-6">
       <Link href="/facilities" className="text-sm underline">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, ErrorBox, Input, Select } from "@/components/ui";
+import { Button, DatePicker, ErrorBox, Select } from "@/components/ui";
 import { errorMessage } from "@/lib/api";
 import { toMinutes, toTime } from "@/lib/format";
 import type { BookingInput } from "./types";
@@ -76,14 +76,12 @@ export function BookingForm({
     <form onSubmit={handleSubmit} noValidate className="flex flex-col">
       <div className="flex flex-col gap-3">
         <ErrorBox message={error} />
-        <Input
-          aria-label="Date"
-          type="date"
-          required
+        <DatePicker
+          ariaLabel="Date"
+          placeholder="Date"
           min={todayUtc()}
           value={bookingDate}
-          onChange={(e) => setBookingDate(e.target.value)}
-          className={placeholderClass(!bookingDate)}
+          onChange={setBookingDate}
         />
         <Select
           aria-label="Start time"

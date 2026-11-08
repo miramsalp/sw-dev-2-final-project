@@ -9,11 +9,11 @@ import { BookingForm } from "./BookingForm";
 import type { BookingInput } from "./types";
 
 export function CreateBooking({ facilityId }: { facilityId: string }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const router = useRouter();
 
   const create = async (input: BookingInput) => {
-    await bookingsApi.create(facilityId, input);
+    await bookingsApi.create(token, facilityId, input);
     router.push("/bookings");
   };
 

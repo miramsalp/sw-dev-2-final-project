@@ -5,18 +5,19 @@ import { useRouter } from "next/navigation";
 import { Card, ErrorBox, Loading, PageTitle } from "@/components/ui";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { toDateInput } from "@/lib/format";
-import { bookingsApi, useBooking } from "./api";
+import { bookingsApi } from "./api";
+import { useBooking } from "./hooks";
 import { BookingForm } from "./BookingForm";
 import type { BookingInput } from "./types";
 
 export function EditBooking({ id }: { id: string }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const router = useRouter();
   const { data: booking, error, loading } = useBooking(id);
   const backHref = user?.role === "admin" ? "/admin" : "/bookings";
 
   const save = async (input: BookingInput) => {
-    await bookingsApi.update(id, input);
+    await bookingsApi.update(token, id, input);
     router.push(backHref);
   };
 

@@ -1,19 +1,4 @@
-const TOKEN_KEY = "token";
-
-export function getToken(): string | null {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function setToken(token: string | null) {
-  try {
-    if (token) localStorage.setItem(TOKEN_KEY, token);
-    else localStorage.removeItem(TOKEN_KEY);
-  } catch {}
-}
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
 
 export class ApiError extends Error {
   status: number;
@@ -25,19 +10,23 @@ export class ApiError extends Error {
 
 type Method = "GET" | "POST" | "PUT" | "DELETE";
 
-export async function api<T>(
-  path: string,
-  options: { method?: Method; body?: unknown } = {},
-): Promise<T> {
-  const token = getToken();
+interface ApiOptions {
+  method?: Method;
+  body?: unknown;
+  token?: string;
+}
+
+export async function api<T>(path: string, { method = "GET", body, token }: ApiOptions = {}): Promise<T> {
+  const baseUrl = typeof window === "undefined" ? `${BACKEND_URL}/api/v1` : "/api/v1";
   const headers: Record<string, string> = {};
-  if (options.body !== undefined) headers["Content-Type"] = "application/json";
+  if (body !== undefined) headers["Content-Type"] = "application/json";
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`/api/v1${path}`, {
-    method: options.method ?? "GET",
+  const res = await fetch(`${baseUrl}${path}`, {
+    method,
     headers,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+    cache: "no-store",
   });
 
   const json = await res.json().catch(() => null);

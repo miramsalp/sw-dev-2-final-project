@@ -4,11 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { ErrorBox, Loading, PageTitle } from "@/components/ui";
 import { errorMessage } from "@/lib/api";
-import { bookingsApi, useBookings } from "./api";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { bookingsApi } from "./api";
+import { useBookings } from "./hooks";
 import { BookingTable } from "./BookingTable";
 import type { Booking } from "./types";
 
 export function MyBookings() {
+  const { token } = useAuth();
   const { data: bookings, error, loading, reload } = useBookings();
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -16,7 +19,7 @@ export function MyBookings() {
     if (!confirm(`Delete booking at ${booking.facility?.name ?? "this facility"}?`)) return;
     setActionError(null);
     try {
-      await bookingsApi.remove(booking._id);
+      await bookingsApi.remove(token, booking._id);
       reload();
     } catch (err) {
       setActionError(errorMessage(err));

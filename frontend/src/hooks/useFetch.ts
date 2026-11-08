@@ -9,14 +9,14 @@ interface FetchState<T> {
   loading: boolean;
 }
 
-export function useFetch<T>(path: string | null) {
+export function useFetch<T>(path: string | null, token?: string) {
   const [state, setState] = useState<FetchState<T>>({ data: null, error: null, loading: true });
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
     if (!path) return;
     let cancelled = false;
-    api<T>(path)
+    api<T>(path, { token })
       .then((data) => {
         if (!cancelled) setState({ data, error: null, loading: false });
       })
@@ -26,7 +26,7 @@ export function useFetch<T>(path: string | null) {
     return () => {
       cancelled = true;
     };
-  }, [path, version]);
+  }, [path, token, version]);
 
   return { ...state, reload: () => setVersion((v) => v + 1) };
 }

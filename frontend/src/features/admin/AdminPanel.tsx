@@ -1,8 +1,9 @@
 "use client";
 
 // TODO: Admin panel is layout only, not connected to the API yet.
-//   Facilities: useFacilities() + facilitiesApi.create/update/remove from @/features/facilities/api
-//   Bookings:   useBookings() (admin gets ALL bookings) + bookingsApi.remove from @/features/bookings/api
+//   Facilities: useFacilities() from @/features/facilities/hooks + facilitiesApi.create/update/remove(token, ...) from @/features/facilities/api
+//   Bookings:   useBookings() from @/features/bookings/hooks (admin gets ALL bookings) + bookingsApi.remove(token, id)
+//               Get token from useAuth() in @/features/auth/AuthProvider
 //               Render with <BookingTable showMember ... />; Edit links already go to /bookings/[id]/edit
 //   See features/bookings/MyBookings.tsx for a working example.
 

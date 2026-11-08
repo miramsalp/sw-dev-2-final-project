@@ -57,6 +57,7 @@ controllers/     Request handlers
 middleware/      Authentication and authorization middleware
 models/          Mongoose schemas
 routes/          Express API routes
+seeds/           Base data (npm run seed)
 server.js        Application entry point
 ```
 
@@ -70,7 +71,13 @@ server.js        Application entry point
 
 2. Set `MONGO_URI` and a strong `JWT_SECRET` in `config/config.env`.
 
-3. Start the development server:
+3. (Optional) Add the base facilities (Badminton, Basketball, Football, Tennis). This is safe to run again and never changes existing facilities:
+
+   ```bash
+   npm run seed
+   ```
+
+4. Start the development server:
 
    ```bash
    npm run dev

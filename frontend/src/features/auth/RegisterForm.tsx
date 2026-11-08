@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Card, ErrorBox, Field, Input, PageTitle, Select } from "@/components/ui";
+import { Button, ErrorBox, Input, Select } from "@/components/ui";
 import { errorMessage } from "@/lib/api";
 import { useAuth } from "./AuthProvider";
 import type { Role } from "./types";
@@ -61,43 +62,73 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="mx-auto max-w-md">
-      <PageTitle>Register</PageTitle>
-      <Card>
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-          <ErrorBox message={error} />
-          <Field label="Name">
-            <Input value={form.name} onChange={update("name")} />
-          </Field>
-          <Field label="Email">
-            <Input type="email" value={form.email} onChange={update("email")} />
-          </Field>
-          <Field label="Telephone">
-            <Input type="tel" value={form.tel} onChange={update("tel")} />
-          </Field>
-          <Field label="Role">
-            <Select value={form.role} onChange={update("role")}>
-              <option value="member">Member</option>
-              <option value="admin">Admin</option>
-            </Select>
-          </Field>
-          <Field label="Password">
-            <Input type="password" value={form.password} onChange={update("password")} />
-          </Field>
-          <Field label="Confirm password">
-            <Input type="password" value={form.confirmPassword} onChange={update("confirmPassword")} />
-          </Field>
-          <Button type="submit" disabled={submitting}>
-            {submitting ? "Creating account..." : "Register"}
-          </Button>
-        </form>
-      </Card>
-      <p className="mt-4 text-sm">
-        Already have an account?{" "}
-        <Link href="/login" className="underline">
-          Log in
-        </Link>
-      </p>
+    <div
+      data-full-bleed
+      className="mt-2.5 flex items-center justify-center gap-16 px-4 py-4 font-plex"
+    >
+      <div className="relative hidden h-[902px] w-[606px] shrink-0 xl:block">
+        <Image
+          src="/images/register-banner.jpg"
+          alt=""
+          fill
+          preload
+          sizes="606px"
+          className="object-cover"
+        />
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="flex w-full max-w-[598px] min-w-0 flex-col items-start gap-6"
+      >
+        <h1 className="text-2xl font-semibold">Register</h1>
+        <ErrorBox message={error} />
+        <div className="flex w-full flex-col gap-5">
+          <Input aria-label="Name" placeholder="Name" value={form.name} onChange={update("name")} />
+          <Input
+            aria-label="Email"
+            placeholder="Email"
+            type="email"
+            value={form.email}
+            onChange={update("email")}
+          />
+          <Input
+            aria-label="Tel"
+            placeholder="Tel"
+            type="tel"
+            value={form.tel}
+            onChange={update("tel")}
+          />
+          <Select aria-label="Role" value={form.role} onChange={update("role")}>
+            <option value="member">Member</option>
+            <option value="admin">Admin</option>
+          </Select>
+          <Input
+            aria-label="Password"
+            placeholder="Password"
+            type="password"
+            value={form.password}
+            onChange={update("password")}
+          />
+          <Input
+            aria-label="Confirm password"
+            placeholder="Confirm password"
+            type="password"
+            value={form.confirmPassword}
+            onChange={update("confirmPassword")}
+          />
+        </div>
+        <Button type="submit" size="lg" disabled={submitting}>
+          {submitting ? "Creating account..." : "Register"}
+        </Button>
+        <p className="text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className="underline">
+            Log in
+          </Link>
+        </p>
+      </form>
     </div>
   );
 }

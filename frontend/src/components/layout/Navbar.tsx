@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui";
 import { useAuth } from "@/features/auth/AuthProvider";
+
+const navLinkClass =
+  "flex h-[60px] min-w-[97px] items-center justify-center px-5 py-2.5 font-medium hover:bg-black/10";
 
 export function Navbar() {
   const { user, loading, logout } = useAuth();
@@ -15,41 +17,41 @@ export function Navbar() {
   };
 
   return (
-    <nav className="border-b border-black">
-      <div className="mx-auto flex max-w-4xl flex-wrap items-center gap-4 px-4 py-3">
-        <Link href="/" className="font-bold">
+    <nav className="border-b-3 border-black bg-[#ee7d57] font-plex text-black">
+      <div className="flex flex-wrap items-center justify-between pl-5">
+        <Link href="/" className="text-xl font-bold">
           Sports Booking
         </Link>
-        <Link href="/facilities" className="underline">
-          Facilities
-        </Link>
-        {user?.role === "member" && (
-          <Link href="/bookings" className="underline">
-            My Bookings
-          </Link>
-        )}
-        {user?.role === "admin" && (
-          <Link href="/admin" className="underline">
-            Admin Panel
-          </Link>
-        )}
 
-        <div className="ml-auto flex items-center gap-3 text-sm">
+        <div className="flex flex-wrap items-center">
+          <Link href="/facilities" className={navLinkClass}>
+            Facilities
+          </Link>
+          {user?.role === "member" && (
+            <Link href="/bookings" className={navLinkClass}>
+              My Bookings
+            </Link>
+          )}
+          {user?.role === "admin" && (
+            <Link href="/admin" className={navLinkClass}>
+              Admin Panel
+            </Link>
+          )}
           {loading ? null : user ? (
             <>
-              <span>
-                {user.name} ({user.role})
+              <button type="button" onClick={handleLogout} className={`${navLinkClass} cursor-pointer`}>
+                Logout
+              </button>
+              <span className="flex h-[60px] items-center justify-center bg-[#030303] px-4 py-2.5 text-xl font-semibold whitespace-nowrap text-white">
+                {user.name}
               </span>
-              <Button variant="secondary" onClick={handleLogout}>
-                Log out
-              </Button>
             </>
           ) : (
             <>
-              <Link href="/login" className="underline">
-                Log in
+              <Link href="/login" className={navLinkClass}>
+                Login
               </Link>
-              <Link href="/register" className="underline">
+              <Link href="/register" className={navLinkClass}>
                 Register
               </Link>
             </>

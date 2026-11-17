@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, ErrorBox, Input, Select } from "@/components/ui";
+import { Button, ErrorBox, Input } from "@/components/ui";
 import { errorMessage } from "@/lib/api";
 import { AuthSplitLayout } from "./AuthSplitLayout";
 import { useAuth } from "./AuthProvider";
@@ -16,7 +16,6 @@ const initialForm = {
   name: "",
   email: "",
   tel: "",
-  role: "member" as Role,
   password: "",
   confirmPassword: "",
 };
@@ -32,7 +31,8 @@ function validate(form: Form): string | null {
   return null;
 }
 
-export function RegisterForm() {
+export function RegisterForm({ role = "member" }: { role?: Role }) {
+  const isAdmin = role === "admin";
   const { register } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState(initialForm);
@@ -40,7 +40,7 @@ export function RegisterForm() {
   const [submitting, setSubmitting] = useState(false);
 
   const update =
-    (key: keyof Form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    (key: keyof Form) => (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm({ ...form, [key]: e.target.value });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,7 +51,7 @@ export function RegisterForm() {
     setError(null);
     setSubmitting(true);
     try {
-      const { name, email, tel, role, password } = form;
+      const { name, email, tel, password } = form;
       const user = await register({ name, email, tel, role, password });
       router.push(user.role === "admin" ? "/admin" : "/facilities");
     } catch (err) {
@@ -68,7 +68,7 @@ export function RegisterForm() {
         noValidate
         className="flex w-full max-w-[598px] min-w-0 flex-col items-start gap-6"
       >
-        <h1 className="text-2xl font-semibold">Register</h1>
+        <h1 className="text-2xl font-semibold">{isAdmin ? "Admin register" : "Register"}</h1>
         <ErrorBox message={error} />
         <div className="flex w-full flex-col gap-5">
           <Input aria-label="Name" placeholder="Name" value={form.name} onChange={update("name")} />
@@ -86,10 +86,6 @@ export function RegisterForm() {
             value={form.tel}
             onChange={update("tel")}
           />
-          <Select aria-label="Role" value={form.role} onChange={update("role")}>
-            <option value="member">Member</option>
-            <option value="admin">Admin</option>
-          </Select>
           <Input
             aria-label="Password"
             placeholder="Password"
